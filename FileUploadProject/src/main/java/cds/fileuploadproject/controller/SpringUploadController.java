@@ -23,13 +23,13 @@ public class SpringUploadController {
 
     @GetMapping("/upload")
     public String newFile() {
-        return "upload.form";
+        return "problem/upload-form";
     }
 
     @PostMapping("/upload")
-    public String saveFile(@RequestParam String itemName, @RequestParam MultipartFile file, HttpServletRequest request) throws IOException {
+    public String saveFile(@RequestParam String problemName, @RequestParam MultipartFile file, HttpServletRequest request) throws IOException {
         log.info("request={}",request);
-        log.info("itemName={}",itemName);
+        log.info("problemName={}",problemName);
         log.info("multipartFile={}", file);
 
         if (!file.isEmpty()) { // 파일이 비어있지 않으면!
@@ -38,6 +38,6 @@ public class SpringUploadController {
             file.transferTo(new File(fullPath));
         }
 
-        return "upload.form";
+        return "problem/upload-form";
     }
 }

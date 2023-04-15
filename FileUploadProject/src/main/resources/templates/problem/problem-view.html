@@ -1,0 +1,22 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+</head>
+<body>
+
+<div class="container">
+
+    <div class="py-5 text-center">
+        <h2>문제 조회</h2>
+    </div>
+
+    문제이름: <span th:text="${problem.problemName}">문제이름</span><br/>
+    첨부파일: <a th:if="${problem.attachFile}" th:href="|/attach/${problem.id}|"
+             th:text="${problem.getAttachFile().getUploadFileName()}"/><br/>
+    <img th:each="imageFile : ${problem.imageFiles}" th:src="|/images/${imageFile.getStoreFileName()}|" width="300"
+         height="300"/>
+
+</div> <!-- /container -->
+</body>
+</html>

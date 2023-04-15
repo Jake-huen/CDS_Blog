@@ -1,0 +1,26 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+</head>
+<body>
+
+<div class="container">
+
+    <div class="py-5 text-center">
+        <h2>알고리즘 문제 업로드</h2>
+    </div>
+
+    <h4 class="mb-3">알고리즘 제출</h4>
+
+    <form th:action method="post" enctype="multipart/form-data">
+        <ul>
+            <li>문제번호 <input type="text" name="problemName"></li>
+            <li>파일<input type="file" name="file" ></li>
+        </ul>
+        <input type="submit"/>
+    </form>
+
+</div> <!-- /container -->
+</body>
+</html>
