@@ -2,6 +2,11 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
+    <script th:inline="javascript">
+        function showAlert() {
+            alert('문제가 제출되었습니다.');
+        }
+    </script>
 </head>
 <body>
 
@@ -13,7 +18,7 @@
 
     <h4 class="mb-3">알고리즘 제출</h4>
 
-    <form th:action method="post" enctype="multipart/form-data">
+    <form th:action method="post" enctype="multipart/form-data" onsubmit="showAlert()">
         <ul>
             <li>문제번호 <input type="text" name="problemName"></li>
             <li>파일<input type="file" name="file" ></li>

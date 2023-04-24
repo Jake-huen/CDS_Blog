@@ -3,7 +3,6 @@ package cds.fileuploadproject.domain.member;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
-import javax.swing.text.html.Option;
 import java.util.*;
 
 @Slf4j
@@ -16,6 +15,7 @@ public class MemberRepository {
     public Member save(Member member) {
         member.setId(++sequence);
         log.info("save: member={}", member);
+        System.out.println("member = " + member);
         store.put(member.getId(), member);
         return member;
     }

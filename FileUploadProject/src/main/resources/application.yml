@@ -8,11 +8,19 @@ server:
     session:
       tracking-modes: cookie
       timeout: 1800
-  port: 8080
-  second:
-    port: 8081
-  third:
-    port: 8080
 file:
   dir:
+#    \home\ubuntu\cds_project_upload\
     C:\Users\tae77\OneDrive\cds_project_upload\
+#cloud:
+#  aws:
+#    region:
+#      static: ap-northeast-2
+#    s3:
+#      bucket: cds-project-bucket
+#    credentials:
+#      access-key: AKIAWCBPU4AMU6H5HMX2
+#      secret-key: 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
+#    stack:
+#      auto: false
+

@@ -37,17 +37,17 @@ public class FileStore {
             return null;
         }
         String originalFilename = multipartFile.getOriginalFilename();
-        String storeFileName = createStoreFileName(originalFilename);
-        multipartFile.transferTo(new File(getFullPath(storeFileName)));
-        return new UploadFile(originalFilename, storeFileName);
+        // String storeFileName = createStoreFileName(originalFilename); // 서버에 저장하는 파일이름 나중을 위해서 그냥 같은 이름으로 저장하기.
+        multipartFile.transferTo(new File(getFullPath(originalFilename)));
+        return new UploadFile(originalFilename, originalFilename);
     }
 
-    private String createStoreFileName(String originalFilename) {
-        // 서버에 저장하는 파일명
-        String uuid = UUID.randomUUID().toString();
-        String ext = extractExt(originalFilename);
-        return uuid + "." + ext;
-    }
+//    private String createStoreFileName(String originalFilename) {
+//        // 서버에 저장하는 파일명
+//        String uuid = UUID.randomUUID().toString();
+//        String ext = extractExt(originalFilename);
+//        return uuid + "." + ext;
+//    }
 
     private String extractExt(String originalFilename) {
         int pos = originalFilename.lastIndexOf(".");

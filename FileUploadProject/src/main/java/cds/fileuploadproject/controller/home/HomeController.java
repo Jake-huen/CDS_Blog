@@ -13,69 +13,14 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class HomeController {
     // 메인 화면
-    @GetMapping("/")
+    @GetMapping("/home")
     public String homeLoginSpring(@SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember, Model model) {
         //세션에 회원 데이터가 있는 경우
         if (loginMember == null) {
             return "home";
         }
-
         //세션이 유지되면 로그인으로 이동
         model.addAttribute("member", loginMember);
         return "login/loginHome";
     }
-
 }
-
-//    @GetMapping("/")
-//    public String homeLoginV3(HttpServletRequest request, Model model) {
-//
-//        // 세션 관리자에 저장된 회원 정보 조회
-//        HttpSession session = request.getSession(false);
-//        // 세션에 값이 없으면 home
-//        if (session == null) {
-//            return "home";
-//        }
-//        Member loginMember = (Member) session.getAttribute(SessionConst.LOGIN_MEMBER);
-//        //세션이 유지되면 로그인으로 이동
-//        model.addAttribute("member", loginMember);
-//        return "login/loginHome";
-//    }
-
-
-//    @GetMapping("/")
-//    public String homeLoginV2(HttpServletRequest request, Model model) {
-//
-//        // 세션 관리자에 저장된 회원 정보 조회
-//        Object member = (Member) sessionManager.getSession(request);
-//
-//        // 로그인
-//        if (member == null) {
-//            return "home";
-//        }
-//
-//        model.addAttribute("member", member);
-//        return "login/loginHome";
-//    }
-
-
-//@GetMapping("/")
-//    public String home() {
-//        return "home";
-//    }
-
-//    @GetMapping("/")
-//    public String homeLogin(@CookieValue(name = "memberId", required = false) Long memberId, Model model) {
-//        if (memberId == null) {
-//            return "home";
-//        }
-//
-//        // 로그인
-//        Member loginMember = memberRepository.findById(memberId);
-//        if (loginMember == null) {
-//            return "home";
-//        }
-//
-//        model.addAttribute("member", loginMember);
-//        return "login/loginHome";
-//    }

@@ -4,6 +4,32 @@
   <meta charset="utf-8">
   <link th:href="@{/css/bootstrap.min.css}"
         href="../css/bootstrap.min.css" rel="stylesheet">
+  <script>
+    let stompClient = null;
+    function login() {
+      let socket = new SockJS('/gs-guide-websocket');
+      stompClient = Stomp.over(socket);
+      stompClient.connect({}, function (frame) {
+        setConnected(true);
+        console.log('로그인 : ' + frame);
+        stompClient.subscribe('/topic/greetings', function (greeting) {
+          showGreeting(JSON.parse(greeting.body).content);
+        });
+      });
+    }
+
+    function logout(){
+      if (stompClient !== null) {
+        stompClient.disconnect();
+      }
+      stompClient.subscribe('/topic/logout', function (greeting) {
+        showGreeting(JSON.parse(greeting.body).content);
+      });
+      setConnected(false);
+      console.log("로그아웃");
+      location.href='problem/index.html'
+    }
+  </script>
 </head>
 <body>
 
@@ -25,7 +51,7 @@
     </div>
     <div class="col">
       <form th:action="@{/logout}" method="post">
-        <button class="w-100 btn btn-dark btn-lg" onclick="location.href='problem/index.html'" type="submit">
+        <button class="w-100 btn btn-dark btn-lg" onclick=logout() type="submit">
           로그아웃
         </button>
       </form>
