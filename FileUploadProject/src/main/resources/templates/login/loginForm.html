@@ -13,19 +13,6 @@
       color: #dc3545;
     }
   </style>
-  <script>
-    let stompClient = null;
-    function login() {
-      let socket = new SockJS('/gs-guide-websocket');
-      stompClient = Stomp.over(socket);
-      stompClient.connect({}, function (frame) {
-        setConnected(true);
-        console.log('로그인 : ' + frame);
-        stompClient.subscribe('/topic/greetings', function (greeting) {
-          showGreeting(JSON.parse(greeting.body).content);
-        });
-      });
-  </script>
 </head>
 <body>
 

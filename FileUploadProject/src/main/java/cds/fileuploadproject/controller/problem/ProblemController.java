@@ -81,6 +81,8 @@ public class ProblemController {
 
         String encodedUploadFileName = UriUtils.encode(uploadFileName, StandardCharsets.UTF_8);
         String contentDisposition = "attachment; filename=\"" + encodedUploadFileName + "\"";
+        log.info("문제가 잘 제출되었습니다.");
+        System.out.println("문제가 잘 제출되었습니다.");
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)

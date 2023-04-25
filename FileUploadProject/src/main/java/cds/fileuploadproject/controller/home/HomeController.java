@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class HomeController {
     // 메인 화면
-    @GetMapping("/home")
+    @GetMapping("/")
     public String homeLoginSpring(@SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember, Model model) {
         //세션에 회원 데이터가 있는 경우
         if (loginMember == null) {
