@@ -10,7 +10,6 @@
     <script src="/webjars/stomp-websocket/stomp.min.js"></script>
     <script>
         let stompClient = null;
-        $("#file-upload").hide();
         function setConnected(connected) {
             $("#connect").prop("disabled", connected);
             $("#disconnect").prop("disabled", !connected);
@@ -22,7 +21,6 @@
                 $("#file-upload").hide();
             }
         }
-
         function connect() {
             let socket = new SockJS('/login');
             stompClient = Stomp.over(socket);
@@ -53,6 +51,7 @@
 
 
         $(function () {
+            $("#file-upload").hide();
             $("form").on('submit', function (e) {
                 e.preventDefault();
             });
@@ -102,10 +101,10 @@
                 </tbody>
             </table>
         </div>
-        <ul id="file-upload" disabled="disabled">
+        <ul id="file-upload">
             <li>[협동분산시스템] 알고리즘 문제 업로드 사이트
                 <ul>
-                    <li><a href="/spring/upload">파일 업로드하기</a></li>
+                    <li ><a href="/spring/upload">파일 업로드하기</a></li>
 <!--                    <li><a href="/problems/new">알고리즘 - 코드, 제출 이미지 업로드하기</a></li>-->
                 </ul>
             </li>
