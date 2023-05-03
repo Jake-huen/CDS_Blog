@@ -36,8 +36,8 @@ public class MemberController {
         return "redirect:/";
     }
 
-    @GetMapping("/showMembers")
-    public String showMembers(){
-        return "members/showMembers";
-    }
+//    @GetMapping("/showMembers")
+//    public String showMembers(){
+//        return "members/showMembers";
+//    }
 }
