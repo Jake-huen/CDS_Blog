@@ -10,13 +10,13 @@ public class GreetingController {
 
     @MessageMapping("/hello")
     @SendTo("/topic/hello")
-    public String loginMessage(String message) throws InterruptedException {
+    public String loginMessage(String message) {
         return message + "님이 로그인하였습니다.";
     }
 
     @MessageMapping("/bye")
     @SendTo("/topic/bye")
-    public String logoutMessage(String message) throws InterruptedException {
+    public String logoutMessage(String message) {
         return message + "님이 로그아웃하였습니다.";
     }
 }

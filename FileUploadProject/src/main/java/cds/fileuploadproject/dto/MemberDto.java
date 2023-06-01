@@ -1,9 +1,9 @@
-package cds.fileuploadproject.domain.member;
+package cds.fileuploadproject.dto;
 
 import lombok.Data;
 
 @Data
-public class Member {
+public class MemberDto {
     private Long id;
     private String loginId; // 로그인 ID
     private String name; // 사용자 이름

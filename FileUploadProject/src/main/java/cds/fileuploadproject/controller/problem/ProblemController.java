@@ -1,9 +1,9 @@
 package cds.fileuploadproject.controller.problem;
 
-import cds.fileuploadproject.domain.problem.Problem;
-import cds.fileuploadproject.domain.problem.ProblemRepository;
-import cds.fileuploadproject.domain.uploadFile.UploadFile;
-import cds.fileuploadproject.file.FileStore;
+import cds.fileuploadproject.dto.ProblemDto;
+import cds.fileuploadproject.repository.ProblemService;
+import cds.fileuploadproject.dto.UploadFileDto;
+import cds.fileuploadproject.service.file.fileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
@@ -26,8 +26,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProblemController {
 
-    private final ProblemRepository problemRepository;
-    private final FileStore fileStore;
+    private final ProblemService problemService;
+    private final fileService fileService;
 
     @GetMapping("/problems")
     public String problemHome(){
@@ -39,43 +39,49 @@ public class ProblemController {
         return "problem/problem-form";
     }
 
+//    @PostMapping
+//    public ResponseEntity<FileDetail> post(
+//            @RequestPart("file") MultipartFile multipartFile) {
+//        return ResponseEntity.ok(fileUploadService.save(multipartFile));
+//    }
+
     @PostMapping("/problems/new")
     public String saveItem(@ModelAttribute ProblemForm form, RedirectAttributes redirectAttributes) throws IOException {
-        UploadFile attachFile = fileStore.storeFile(form.getAttachFile());
-        List<UploadFile> storeImageFiles = fileStore.storeFiles(form.getImageFiles());
+        UploadFileDto attachFile = fileService.storeFile(form.getAttachFile());
+        List<UploadFileDto> storeImageFiles = fileService.storeFiles(form.getImageFiles());
 
         // 데이터베이스에 저장
-        Problem problem = new Problem();
-        problem.setProblemName(form.getProblemName());
-        problem.setAttachFile(attachFile);
-        problem.setImageFiles(storeImageFiles);
-        problemRepository.save(problem);
+        ProblemDto problemDto = new ProblemDto();
+        problemDto.setProblemName(form.getProblemName());
+        problemDto.setAttachFile(attachFile);
+        problemDto.setImageFiles(storeImageFiles);
+        problemService.save(problemDto);
 
-        redirectAttributes.addAttribute("problemId", problem.getId());
+        redirectAttributes.addAttribute("problemId", problemDto.getId());
 
         return "redirect:/problems/{problemId}";
     }
 
     @GetMapping("/problems/{id}")
     public String items(@PathVariable Long id, Model model) {
-        Problem problem = problemRepository.findById(id);
-        model.addAttribute("problem", problem);
+        ProblemDto problemDto = problemService.findById(id);
+        model.addAttribute("problem", problemDto);
         return "problem/problem-view";
     }
 
     @ResponseBody
     @GetMapping("/images/{filename}")
     public Resource downloadImage(@PathVariable String filename) throws MalformedURLException {
-        return new UrlResource("file: " + fileStore.getFullPath(filename));
+        return new UrlResource("file: " + fileService.getFullPath(filename));
     }
 
     @GetMapping("/attach/{problemId}")
     public ResponseEntity<Resource> downloadAttach(@PathVariable Long problemId) throws MalformedURLException {
-        Problem problem = problemRepository.findById(problemId);
-        String storeFileName = problem.getAttachFile().getStoreFileName();
-        String uploadFileName = problem.getAttachFile().getUploadFileName();
+        ProblemDto problemDto = problemService.findById(problemId);
+        String storeFileName = problemDto.getAttachFile().getStoreFileName();
+        String uploadFileName = problemDto.getAttachFile().getUploadFileName();
 
-        UrlResource urlResource = new UrlResource("file: " + fileStore.getFullPath(storeFileName));
+        UrlResource urlResource = new UrlResource("file: " + fileService.getFullPath(storeFileName));
 
         log.info("uploadFileName={}", uploadFileName);
 

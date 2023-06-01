@@ -1,14 +1,10 @@
 package cds.fileuploadproject.controller.login;
 
 import cds.fileuploadproject.controller.session.SessionConst;
-import cds.fileuploadproject.domain.login.LoginService;
-import cds.fileuploadproject.domain.member.Member;
+import cds.fileuploadproject.dto.MemberDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,7 +19,7 @@ import javax.servlet.http.HttpSession;
 @RequiredArgsConstructor
 public class LoginController {
 
-    private final LoginService loginService;
+    private final cds.fileuploadproject.service.login.loginService loginService;
 
     @GetMapping("/login")
     public String loginForm(@ModelAttribute("loginForm") LoginForm loginForm) {
@@ -35,19 +31,16 @@ public class LoginController {
         if (bindingResult.hasErrors()) {
             return "login/loginForm";
         }
-
-        Member loginMember = loginService.login(loginForm.getLoginId(), loginForm.getPassword());
-
-        if (loginMember == null) {
+        MemberDto loginMemberDto = loginService.login(loginForm.getLoginId(), loginForm.getPassword());
+        if (loginMemberDto == null) {
             bindingResult.reject("loginFail", "아이디 또는 비밀번호가 맞지 않습니다.");
             return "login/loginForm";
         }
-
         // 로그인 성공 처리
         // 세션이 있으면 있는 세션 반환, 없으면 신규 세션 생성
         HttpSession session = request.getSession();
         // 세션에 로그인 회원 정보를 보관
-        session.setAttribute(SessionConst.LOGIN_MEMBER, loginMember);
+        session.setAttribute(SessionConst.LOGIN_MEMBER, loginMemberDto);
         return "redirect:/";
     }
 

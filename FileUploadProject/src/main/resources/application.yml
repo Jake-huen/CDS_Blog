@@ -1,26 +1,35 @@
 logging:
   level:
-    org.apache.coyote.http11:
-      debug
-
+    com:
+      amazonaws:
+        util:
+          EC2MetadataUtils: ERROR
 server:
   servlet:
     session:
       tracking-modes: cookie
       timeout: 1800
+  port: 8081
+spring:
+  datasource:
+    driver-class-name:
+      com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/cdsproject
+    username: root
+    password: rlaxogjs8312
 file:
   dir:
-#    \home\ubuntu\cds_project_upload\
-    C:\Users\tae77\OneDrive\cds_project_upload\
-#cloud:
-#  aws:
-#    region:
-#      static: ap-northeast-2
-#    s3:
-#      bucket: cds-project-bucket
-#    credentials:
-#      access-key: AKIAWCBPU4AMU6H5HMX2
-#      secret-key: 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
-#    stack:
-#      auto: false
+    /Users/kimtaeheon/Desktop/cds_project_upload/
 
+cloud:
+  aws:
+    s3:
+      bucket: cds-project-bucket
+    credentials:
+      access-key: AKIAWCBPU4AM6YITK37K
+      secret-key: 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
+    region:
+      static: ap-northeast-2
+      auto: false
+    stack:
+      auto: false

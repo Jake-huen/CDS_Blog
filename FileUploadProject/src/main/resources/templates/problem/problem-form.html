@@ -11,7 +11,7 @@
         <h2>문제 업로드</h2>
     </div>
 
-    <form th:action method="post" enctype="multipart/form-data" id="problem-form">
+    <form th:action method="post" enctype="multipart/form-data" id="problemDto-form">
         <ul>
             <li>문제이름 <input type="text" name="problemName"></li>
             <li>첨부파일 <input type="file" name="attachFile" ></li>
@@ -21,7 +21,7 @@
     </form>
     <script th:inline="javascript">
         window.onload = () => {
-            const form = document.getElementById('problem-form');
+            const form = document.getElementById('problemDto-form');
             if (form.submit()) {
                 alert('문제가 업로드되었습니다.');
             }
