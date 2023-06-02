@@ -20,4 +20,4 @@
 2.4 클라이언트 접속 상태에서 파일 전송 반복 수행 테스트
 
 ### 현재 접속 가능한 URL
-htpp://cdsfileupload.ap-northeast-2.elasticbeanstalk.com
+http://cdsfileupload.ap-northeast-2.elasticbeanstalk.com
