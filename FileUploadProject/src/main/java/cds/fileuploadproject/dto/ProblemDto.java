@@ -6,7 +6,6 @@ import java.util.List;
 
 @Data
 public class ProblemDto {
-
     private Long id;
     private String problemName;
     private UploadFileDto attachFile;

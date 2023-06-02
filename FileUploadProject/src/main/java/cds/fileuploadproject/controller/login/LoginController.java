@@ -2,6 +2,7 @@ package cds.fileuploadproject.controller.login;
 
 import cds.fileuploadproject.controller.session.SessionConst;
 import cds.fileuploadproject.dto.MemberDto;
+import cds.fileuploadproject.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -19,7 +20,7 @@ import javax.servlet.http.HttpSession;
 @RequiredArgsConstructor
 public class LoginController {
 
-    private final cds.fileuploadproject.service.login.loginService loginService;
+    private final MemberService memberService;
 
     @GetMapping("/login")
     public String loginForm(@ModelAttribute("loginForm") LoginForm loginForm) {
@@ -31,7 +32,7 @@ public class LoginController {
         if (bindingResult.hasErrors()) {
             return "login/loginForm";
         }
-        MemberDto loginMemberDto = loginService.login(loginForm.getLoginId(), loginForm.getPassword());
+        MemberDto loginMemberDto = memberService.login(loginForm.getUserName(), loginForm.getPassword());
         if (loginMemberDto == null) {
             bindingResult.reject("loginFail", "아이디 또는 비밀번호가 맞지 않습니다.");
             return "login/loginForm";

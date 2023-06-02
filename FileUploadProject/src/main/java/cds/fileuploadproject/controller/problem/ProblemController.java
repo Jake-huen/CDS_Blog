@@ -1,9 +1,9 @@
 package cds.fileuploadproject.controller.problem;
 
 import cds.fileuploadproject.dto.ProblemDto;
-import cds.fileuploadproject.repository.ProblemService;
 import cds.fileuploadproject.dto.UploadFileDto;
-import cds.fileuploadproject.service.file.fileService;
+import cds.fileuploadproject.service.file.FileService;
+import cds.fileuploadproject.service.problem.ProblemService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
@@ -27,7 +27,7 @@ import java.util.List;
 public class ProblemController {
 
     private final ProblemService problemService;
-    private final fileService fileService;
+    private final FileService fileService;
 
     @GetMapping("/problems")
     public String problemHome(){
@@ -38,12 +38,6 @@ public class ProblemController {
     public String newItem(@ModelAttribute ProblemForm form) {
         return "problem/problem-form";
     }
-
-//    @PostMapping
-//    public ResponseEntity<FileDetail> post(
-//            @RequestPart("file") MultipartFile multipartFile) {
-//        return ResponseEntity.ok(fileUploadService.save(multipartFile));
-//    }
 
     @PostMapping("/problems/new")
     public String saveItem(@ModelAttribute ProblemForm form, RedirectAttributes redirectAttributes) throws IOException {

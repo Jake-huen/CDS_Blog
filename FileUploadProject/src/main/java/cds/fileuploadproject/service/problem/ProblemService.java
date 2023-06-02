@@ -1,4 +1,4 @@
-package cds.fileuploadproject.repository;
+package cds.fileuploadproject.service.problem;
 
 import cds.fileuploadproject.dto.ProblemDto;
 import lombok.extern.slf4j.Slf4j;

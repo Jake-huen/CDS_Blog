@@ -22,7 +22,7 @@ public class SessionInfoController {
         session.getAttributeNames().asIterator()
                 .forEachRemaining(name -> log.info("session name={}, value={}", name, session.getAttribute(name)));
         log.info("sessionId={}",session.getId());
-        log.info("creationTiem={}", new Date(session.getCreationTime()));
+        log.info("creationTime={}", new Date(session.getCreationTime()));
 
         return "세션 출력";
     }
