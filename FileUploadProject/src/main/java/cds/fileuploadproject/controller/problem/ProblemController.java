@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.util.UriUtils;
 
@@ -28,6 +29,7 @@ public class ProblemController {
 
     private final ProblemService problemService;
     private final FileService fileService;
+    private final S3Uploader s3Uploader;
 
     @GetMapping("/problems")
     public String problemHome(){

@@ -9,6 +9,8 @@ server:
     session:
       tracking-modes: cookie
       timeout: 1800
+  port:
+    5000
 spring:
   jpa:
     open-in-view: false
@@ -20,20 +22,20 @@ spring:
   datasource:
     driver-class-name:
       com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/cdsproject
+    url: jdbc:mysql://awseb-e-exxa7rnbas-stack-awsebrdsdatabase-83nh5tgicvgk.c9pavs7woqch.ap-northeast-2.rds.amazonaws.com:3306/cdsproject
     username: root
     password: rlaxogjs8312
+  sql.init.mode: always
 file:
   dir:
     /Users/kimtaeheon/Desktop/cds_project_upload/
-
 cloud:
   aws:
     s3:
       bucket: cds-project-bucket
     credentials:
-      access-key: AKIAWCBPU4AM6YITK37K
-      secret-key: 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
+      access-key: AKIAWCBPU4AM3TRM5MW4
+      secret-key: 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
     region:
       static: ap-northeast-2
       auto: false

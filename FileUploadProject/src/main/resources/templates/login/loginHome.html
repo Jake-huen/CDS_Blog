@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>로그인</title>
-    <link href="/webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/main.css" rel="stylesheet">
-    <script src="/webjars/jquery/jquery.min.js"></script>
-    <script src="/webjars/sockjs-client/sockjs.min.js"></script>
-    <script src="/webjars/stomp-websocket/stomp.min.js"></script>
+    <link th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/main.css}" rel="stylesheet">
+    <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+    <script th:src="@{/webjars/sockjs-client/sockjs.min.js}"></script>
+    <script th:src="@{/webjars/stomp-websocket/stomp.min.js}"></script>
     <script>
         let stompClient = null;
         function setConnected(connected) {
@@ -68,9 +68,8 @@
     </script>
 </head>
 <body>
-<noscript><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being
-    enabled. Please enable
-    Javascript and reload this page!</h2></noscript>
+<noscript><h2 th:text="'Seems your browser doesn\'t support Javascript! Websocket relies on Javascript being ' +
+    'enabled. Please enable Javascript and reload this page!'" style="color: #ff0000"></h2></noscript>
 <div id="main-content" class="container">
     <div class="row">
         <div class="col-md-6">
@@ -104,8 +103,8 @@
         <ul id="file-upload">
             <li>[협동분산시스템] 알고리즘 문제 업로드 사이트
                 <ul>
-                    <li ><a href="/spring/upload">파일 업로드하기</a></li>
-<!--                    <li><a href="/problems/new">알고리즘 - 코드, 제출 이미지 업로드하기</a></li>-->
+                    <li><a href="/spring/upload">파일 업로드하기</a></li>
+                    <!--                    <li><a href="/problems/new">알고리즘 - 코드, 제출 이미지 업로드하기</a></li>-->
                 </ul>
             </li>
         </ul>
