@@ -39,10 +39,4 @@ public class FileService {
         multipartFile.transferTo(new File(getFullPath(originalFilename)));
         return new UploadFileDto(originalFilename, originalFilename);
     }
-
-    private String extractExt(String originalFilename) {
-        int pos = originalFilename.lastIndexOf(".");
-        return originalFilename.substring(pos + 1);
-    }
-
 }

@@ -1,4 +1,4 @@
-package cds.fileuploadproject.controller.problem;
+package cds.fileuploadproject.service.file;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
@@ -12,8 +12,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -25,10 +27,10 @@ public class S3Uploader {
     @Value("${cloud.aws.s3.bucket}")
     public String bucket;
 
-    public String upload(MultipartFile multipartFile, String dirName) throws IOException {
-        Optional<File> uploadFile = convert(multipartFile);
-
-        return upload(uploadFile.get(), dirName);
+    public String upload(List<MultipartFile> multipartFiles, String dirName) throws IOException {
+        Optional<List<File>> uploadFiles = convert(multipartFiles);
+        return uploadFiles.get().stream()
+                .map(uploadFile -> upload(uploadFile, dirName)).toString();
     }
     // S3로 파일 업로드하기
     private String upload(File uploadFile, String dirName) {
@@ -53,17 +55,18 @@ public class S3Uploader {
         log.info("File delete fail");
     }
 
-    private Optional<File> convert(MultipartFile multipartFile) throws IOException{
-        File convertFile = new File(System.getProperty("user.dir") + "/" + multipartFile.getOriginalFilename());
+    private Optional<List<File>> convert(List<MultipartFile> multipartFiles) throws IOException{
+        List<File> convertFiles = multipartFiles.stream()
+                .map(multipartFile -> new File(System.getProperty("user.dir") + "/" + multipartFile.getOriginalFilename()))
+                .collect(Collectors.toList());
         // 바로 위에서 지정한 경로에 File이 생성됨 (경로가 잘못되었다면 생성 불가능)
-        if (convertFile.createNewFile()) {
-            try (FileOutputStream fos = new FileOutputStream(convertFile)) { // FileOutputStream 데이터를 파일에 바이트 스트림으로 저장하기 위함
-                fos.write(multipartFile.getBytes());
-            }
-            return Optional.of(convertFile);
-        }
-
-        return Optional.empty();
+//        if (convertFile.createNewFile()) {
+//            try (FileOutputStream fos = new FileOutputStream(convertFile)) { // FileOutputStream 데이터를 파일에 바이트 스트림으로 저장하기 위함
+//                fos.write(multipartFile.getBytes());
+//            }
+//            return Optional.of(convertFile);
+//        }
+        return Optional.of(convertFiles);
 
     }
 }

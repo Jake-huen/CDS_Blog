@@ -3,6 +3,7 @@ package cds.fileuploadproject.controller.problem;
 import cds.fileuploadproject.dto.ProblemDto;
 import cds.fileuploadproject.dto.UploadFileDto;
 import cds.fileuploadproject.service.file.FileService;
+import cds.fileuploadproject.service.file.S3Uploader;
 import cds.fileuploadproject.service.problem.ProblemService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.util.UriUtils;
 

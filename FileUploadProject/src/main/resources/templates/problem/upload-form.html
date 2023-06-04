@@ -18,10 +18,11 @@
 
     <h4 class="mb-3">알고리즘 제출</h4>
 
-    <form th:action method="post" enctype="multipart/form-data" onsubmit="showAlert()">
+    <form th:action method="post" enctype="multipart/form-data" onsubmit="showAlert()" id="problemDto-form">
         <ul>
             <li>문제번호 <input type="text" name="problemName"></li>
-            <li>파일<input type="file" name="file" ></li>
+            <li>첨부파일 <input type="file" name="attachFile" ></li>
+            <li>이미지 파일들<input type="file" multiple="multiple" name="imageFiles" ></li>
         </ul>
         <input type="submit"/>
     </form>
