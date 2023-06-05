@@ -13,7 +13,7 @@ server:
       tracking-modes: cookie
       timeout: 1800
   port:
-    5000
+    8081
 spring:
   jpa:
     open-in-view: false
@@ -29,9 +29,9 @@ spring:
     username: root
     password: rlaxogjs8312
   sql.init.mode: always
-file:
-  dir:
-    /Users/kimtaeheon/Desktop/cds_project_upload/
+#file:
+#  dir:
+#    /Users/kimtaeheon/Desktop/cds_project_upload/
 cloud:
   aws:
     s3:

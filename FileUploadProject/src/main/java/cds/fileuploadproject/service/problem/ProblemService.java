@@ -1,27 +1,91 @@
 package cds.fileuploadproject.service.problem;
 
-import cds.fileuploadproject.dto.ProblemDto;
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.PutObjectRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Repository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
-@Repository
+@Component
+@RequiredArgsConstructor
 public class ProblemService {
-    private final Map<Long, ProblemDto> problemMap = new HashMap<>();
-    private long sequence = 0L;
 
-    public ProblemDto save(ProblemDto problemDto) {
-        problemDto.setId(++sequence);
-        problemMap.put(problemDto.getId(), problemDto);
-        log.info("save: problem={} 문제가 업로드 되었습니다. ", problemDto);
-        System.out.println("save: problem=" + problemDto + "문제가 업로드 되었습니다. ");
-        return problemDto;
+    private final AmazonS3Client amazonS3Client;
+
+    @Value("${cloud.aws.s3.bucket}")
+    public String bucket;
+
+    public String upload(List<MultipartFile> multipartFiles, String dirName) throws IOException {
+        List<File> uploadFiles = convert(multipartFiles);
+        return uploadFiles.stream()
+                .map(uploadFile -> upload(uploadFile, dirName)).toString();
     }
 
-    public ProblemDto findById(Long id) {
-        return problemMap.get(id);
+    // S3로 파일 업로드하기
+    private String upload(File uploadFile, String dirName) {
+        String fileName = dirName + "/" + uploadFile.getName();   // S3에 저장된 파일 이름
+        String uploadImageUrl = putS3(uploadFile, fileName); // s3로 업로드
+        removeNewFile(uploadFile);
+        return uploadImageUrl;
     }
+
+    // S3로 업로드
+    private String putS3(File uploadFile, String fileName) {
+        amazonS3Client.putObject(new PutObjectRequest(bucket, fileName, uploadFile).withCannedAcl(CannedAccessControlList.PublicRead));
+        return amazonS3Client.getUrl(bucket, fileName).toString();
+    }
+
+    // 로컬에 저장된 이미지 지우기
+    private void removeNewFile(File targetFile) {
+        if (targetFile.delete()) {
+            log.info("File delete success");
+            return;
+        }
+        log.info("File delete fail");
+    }
+
+    private List<File> convert(List<MultipartFile> multipartFiles) throws IOException {
+        List<File> files = new ArrayList<>();
+        for(MultipartFile multipartFile : multipartFiles){
+            File convertFile = new File(System.getProperty("user.dir") + "/" + multipartFile.getOriginalFilename());
+            // 바로 위에서 지정한 경로에 File이 생성됨 (경로가 잘못되었다면 생성 불가능)
+            if (convertFile.createNewFile()) {
+                try (FileOutputStream fos = new FileOutputStream(convertFile)) { // FileOutputStream 데이터를 파일에 바이트 스트림으로 저장하기 위함
+                    fos.write(multipartFile.getBytes());
+                }
+                files.add(convertFile);
+            }
+        }
+        return files;
+    }
+
+//    public List<UploadFileDto> storeFiles(List<MultipartFile> multipartFiles) throws IOException {
+//        List<UploadFileDto> storeFileResult = new ArrayList<>();
+//        for (MultipartFile multipartFile : multipartFiles) {
+//            if (!multipartFile.isEmpty()) {
+//                UploadFileDto uploadFileDto = storeFile(multipartFile);
+//                storeFileResult.add(uploadFileDto);
+//            }
+//        }
+//        return storeFileResult;
+//    }
+//
+//    public UploadFileDto storeFile(MultipartFile multipartFile) throws IOException {
+//        if (multipartFile.isEmpty()) {
+//            return null;
+//        }
+//        String originalFilename = multipartFile.getOriginalFilename();
+//        multipartFile.transferTo(new File(getFullPath(originalFilename)));
+//        return new UploadFileDto(originalFilename, originalFilename);
+//    }
 }
