@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -13,20 +14,19 @@ import java.util.List;
 
 @Slf4j
 @Controller
-@RequestMapping("/spring")
 @RequiredArgsConstructor
 public class SpringUploadController {
 
     private final ProblemService problemService;
 
-    @GetMapping("/upload") // 파일 업로드 사이트
-    public String newFile() {
-        return "problem/upload-form";
+    @GetMapping("/problems/new")
+    public String newProblem(@ModelAttribute ProblemForm form){
+        return "problem/problem-form";
     }
 
-    @PostMapping("/upload")
-    public String saveFile(@RequestParam("imageFiles") List<MultipartFile> multipartFiles, HttpServletRequest request) throws IOException {
-        problemService.upload(multipartFiles, request.getSession().getAttribute("userName").toString());
-        return "problem/upload-form";
+    @PostMapping("/problems/new")
+    public String saveProblem(@ModelAttribute ProblemForm form, HttpServletRequest request, RedirectAttributes redirectAttributes) throws IOException {
+        problemService.upload(form, "주소주소");
+        return "problem/index";
     }
 }

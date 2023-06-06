@@ -1,5 +1,6 @@
 package cds.fileuploadproject.service.problem;
 
+import cds.fileuploadproject.controller.problem.ProblemForm;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
@@ -14,6 +15,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -25,22 +27,27 @@ public class ProblemService {
     @Value("${cloud.aws.s3.bucket}")
     public String bucket;
 
-    public String upload(List<MultipartFile> multipartFiles, String dirName) throws IOException {
-        List<File> uploadFiles = convert(multipartFiles);
-        return uploadFiles.stream()
-                .map(uploadFile -> upload(uploadFile, dirName)).toString();
+    public String upload(ProblemForm form, String dirName) throws IOException {
+        System.out.println("ProblemService.upload first");
+        for(MultipartFile multipartFile: form.getImageFiles()){
+            File uploadFile = convert(multipartFile).orElseThrow(() -> new IllegalArgumentException("파일 전환 실패"));
+            upload(uploadFile, dirName);
+        }
+        return "업로드 성공";
     }
 
     // S3로 파일 업로드하기
     private String upload(File uploadFile, String dirName) {
+        System.out.println("ProblemService.upload second");
         String fileName = dirName + "/" + uploadFile.getName();   // S3에 저장된 파일 이름
         String uploadImageUrl = putS3(uploadFile, fileName); // s3로 업로드
-        removeNewFile(uploadFile);
+        // removeNewFile(uploadFile);
         return uploadImageUrl;
     }
 
     // S3로 업로드
     private String putS3(File uploadFile, String fileName) {
+        System.out.println("ProblemService.putS3");
         amazonS3Client.putObject(new PutObjectRequest(bucket, fileName, uploadFile).withCannedAcl(CannedAccessControlList.PublicRead));
         return amazonS3Client.getUrl(bucket, fileName).toString();
     }
@@ -54,38 +61,15 @@ public class ProblemService {
         log.info("File delete fail");
     }
 
-    private List<File> convert(List<MultipartFile> multipartFiles) throws IOException {
-        List<File> files = new ArrayList<>();
-        for(MultipartFile multipartFile : multipartFiles){
-            File convertFile = new File(System.getProperty("user.dir") + "/" + multipartFile.getOriginalFilename());
-            // 바로 위에서 지정한 경로에 File이 생성됨 (경로가 잘못되었다면 생성 불가능)
-            if (convertFile.createNewFile()) {
-                try (FileOutputStream fos = new FileOutputStream(convertFile)) { // FileOutputStream 데이터를 파일에 바이트 스트림으로 저장하기 위함
-                    fos.write(multipartFile.getBytes());
-                }
-                files.add(convertFile);
+    private Optional<File> convert(MultipartFile multipartFile) throws IOException{
+        File convertFile = new File(System.getProperty("user.dir") + "/" + multipartFile.getOriginalFilename());
+        // 바로 위에서 지정한 경로에 File이 생성됨 (경로가 잘못되었다면 생성 불가능)
+        if (convertFile.createNewFile()) {
+            try (FileOutputStream fos = new FileOutputStream(convertFile)) { // FileOutputStream 데이터를 파일에 바이트 스트림으로 저장하기 위함
+                fos.write(multipartFile.getBytes());
             }
+            return Optional.of(convertFile);
         }
-        return files;
+        return Optional.empty();
     }
-
-//    public List<UploadFileDto> storeFiles(List<MultipartFile> multipartFiles) throws IOException {
-//        List<UploadFileDto> storeFileResult = new ArrayList<>();
-//        for (MultipartFile multipartFile : multipartFiles) {
-//            if (!multipartFile.isEmpty()) {
-//                UploadFileDto uploadFileDto = storeFile(multipartFile);
-//                storeFileResult.add(uploadFileDto);
-//            }
-//        }
-//        return storeFileResult;
-//    }
-//
-//    public UploadFileDto storeFile(MultipartFile multipartFile) throws IOException {
-//        if (multipartFile.isEmpty()) {
-//            return null;
-//        }
-//        String originalFilename = multipartFile.getOriginalFilename();
-//        multipartFile.transferTo(new File(getFullPath(originalFilename)));
-//        return new UploadFileDto(originalFilename, originalFilename);
-//    }
 }

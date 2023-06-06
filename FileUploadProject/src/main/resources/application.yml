@@ -6,15 +6,16 @@ logging:
           EC2MetadataUtils: ERROR
 server:
   servlet:
-    multipart:
-      max-file-size: 20MB
-      max-request-size: 20MB
     session:
       tracking-modes: cookie
       timeout: 1800
   port:
     8081
 spring:
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
   jpa:
     open-in-view: false
     defer-datasource-initialization: true
