@@ -1,14 +1,12 @@
 package cds.fileuploadproject.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Getter
 public class MemberDto {
     private Long id;
     private String userName; // 사용자 이름

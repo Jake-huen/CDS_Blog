@@ -8,15 +8,15 @@
 <div class="container">
 
     <div class="py-5 text-center">
-        <h2>문제 조회</h2>
+        <h2>제출한 문제들 조회</h2>
     </div>
 
-    문제이름: <span th:text="${problemDto.problemName}">문제이름</span><br/>
+    문제이름: <span th:text="${ProblemDto.problemName}">문제이름</span><br/>
     첨부파일: <a th:if="${problemDto.attachFile}" th:href="|/attach/${problemDto.id}|"
              th:text="${problemDto.getAttachFile().getUploadFileName()}"/><br/>
     <img th:each="imageFile : ${problemDto.imageFiles}" th:src="|/images/${imageFile.getStoreFileName()}|" width="300"
          height="300"/>
 
-</div> <!-- /container -->
+</div>
 </body>
 </html>

@@ -1,5 +1,8 @@
 package cds.fileuploadproject.controller.problem;
 
+import cds.fileuploadproject.controller.session.SessionConst;
+import cds.fileuploadproject.domain.Problem;
+import cds.fileuploadproject.dto.MemberDto;
 import cds.fileuploadproject.service.problem.ProblemService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,13 +23,15 @@ public class SpringUploadController {
     private final ProblemService problemService;
 
     @GetMapping("/problems/new")
-    public String newProblem(@ModelAttribute ProblemForm form){
+    public String newProblem(@ModelAttribute ProblemForm form) {
         return "problem/problem-form";
     }
 
     @PostMapping("/problems/new")
     public String saveProblem(@ModelAttribute ProblemForm form, HttpServletRequest request, RedirectAttributes redirectAttributes) throws IOException {
-        problemService.upload(form, "주소주소");
-        return "problem/index";
+        MemberDto memberDto = (MemberDto) request.getSession().getAttribute(SessionConst.LOGIN_MEMBER);
+        List<ProblemForm> problems = problemService.upload(form, memberDto.getUserName());
+        redirectAttributes.addFlashAttribute("problems", problems);
+        return "redirect:/problem-view";
     }
 }
