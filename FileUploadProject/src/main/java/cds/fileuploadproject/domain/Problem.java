@@ -19,9 +19,10 @@ public class Problem {
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private String file_name;
+    private String fileName;
 
-    private URL file_url;
+    @Column(length = 2000)
+    private URL fileUrl;
 
     @OneToOne
     private Member member;

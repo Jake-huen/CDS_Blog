@@ -20,7 +20,7 @@ spring:
     open-in-view: false
     defer-datasource-initialization: true
     hibernate.ddl-auto: create
-    show-sql: true
+    show-sql: false
     properties:
       hibernate.format_sql: true
   datasource:
