@@ -55,7 +55,7 @@ public class ProblemService {
 
         for (MultipartFile multipartFile : form.getImageFiles()) {
             File uploadImage = convert(multipartFile).orElseThrow(() -> new IllegalArgumentException("이미지 파일 전환 실패"));
-            upload(uploadImage, dirName + "님이 제출한" + form.getProblemName() + "문제", dirName, 0);
+            upload(uploadImage, form.getProblemName() + "번 문제 스크린샷", dirName, 0);
         }
     }
 
@@ -93,7 +93,7 @@ public class ProblemService {
     }
 
     private Optional<File> convert(MultipartFile multipartFile) throws IOException {
-        File convertFile = new File(System.getProperty("user.dir") + "/" + multipartFile.getOriginalFilename());
+        File convertFile = new File(multipartFile.getOriginalFilename());
         // 바로 위에서 지정한 경로에 File이 생성됨 (경로가 잘못되었다면 생성 불가능)
         if (convertFile.createNewFile()) {
             try (FileOutputStream fos = new FileOutputStream(convertFile)) { // FileOutputStream 데이터를 파일에 바이트 스트림으로 저장하기 위함
@@ -109,7 +109,7 @@ public class ProblemService {
         List<Problem> problems = problemRepository.findAll();
         List<ProblemDto> problemDtos = new ArrayList<>();
         problems.stream().forEach(problem -> {
-            if(problem.getMember().getUserName().equals(userName) || problem.getFileName().contains("님이 제출한 문제")) {
+            if(problem.getMember().getUserName().equals(userName) || problem.getFileName().contains("스크린샷")) {
                 ProblemDto problemDto = ProblemDto.builder()
                         .problemName(problem.getFileName())
                         .problemURL(problem.getFileUrl())
@@ -192,5 +192,28 @@ public class ProblemService {
         if (stompSession != null && stompSession.isConnected()) {
             stompSession.send("/app/sendMessage", userName+"님이 " + filename + "문제를 삭제하였습니다.");
         }
+    }
+
+    public void sendShareMessage(String problemName, String filename, String userName) {
+        if (stompSession != null && stompSession.isConnected()) {
+            stompSession.send("/app/sendMessage", userName+"님이 " + problemName+"번 문제를 공유하였습니다.\n[문제링크] : " + filename);
+        }
+    }
+
+    public void shareProblem(String problemName, String problemURL, String userName) {
+        List<Transport> transports = new ArrayList<>();
+        transports.add(new WebSocketTransport(new StandardWebSocketClient()));
+        SockJsClient sockJsClient = new SockJsClient(transports);
+        WebSocketStompClient stompClient = new WebSocketStompClient(sockJsClient);
+        stompClient.setMessageConverter(new MappingJackson2MessageConverter());
+        String url = "ws://localhost:8081/chat"; // 로컬 WebScoket URL
+        // String url = "ws://cdsfileupload.ap-northeast-2.elasticbeanstalk.com/chat"; // WebSocket 서버 URL
+        stompClient.connect(url, new StompSessionHandlerAdapter() {
+            @Override
+            public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
+                stompSession = session;
+                sendShareMessage(problemName, problemURL, userName);
+            }
+        });
     }
 }

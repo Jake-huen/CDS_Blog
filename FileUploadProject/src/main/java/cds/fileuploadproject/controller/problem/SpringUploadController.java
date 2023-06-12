@@ -58,6 +58,15 @@ public class SpringUploadController {
         return "redirect:/problem/problem-view";
     }
 
+    @PostMapping("/problem/share")
+    public String handleShareProblem(@RequestParam("problemURL") String problemURL,
+                                     @RequestParam("problemName") String problemName,
+                                     HttpServletRequest request) {
+        MemberDto memberDto = (MemberDto) request.getSession().getAttribute(SessionConst.LOGIN_MEMBER);
+        problemService.shareProblem(problemName, problemURL,memberDto.getUserName());
+        return "redirect:/problem/problem-view";
+    }
+
     // 삭제하기
     @PostMapping("/problem/delete")
     public String handleDeleteProblem(@RequestParam("problemName") String problemName){

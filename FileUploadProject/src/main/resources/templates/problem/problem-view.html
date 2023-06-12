@@ -97,7 +97,11 @@
             </form>
         </td>
         <td>
-            <button>공유하기</button>
+            <form th:action="@{/problem/share}" method="post">
+                <input type="hidden" name="problemURL" th:value="${problem.problemURL}" />
+                <input type="hidden" name="problemName" th:value="${problem.getProblemName()}" />
+                <button type="submit">해당 문제 공유하기</button>
+            </form>
         </td>
         <td>
             <form th:action="@{/problem/delete}" method="post">
