@@ -5,6 +5,65 @@
     <title>로그인</title>
     <link th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
     <link th:href="@{/main.css}" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        #main-content {
+            margin-top: 50px;
+        }
+
+        #connect {
+            margin-right: 10px;
+        }
+
+        #conversation {
+            margin-top: 20px;
+        }
+
+        #file-upload {
+            margin-top: 20px;
+            list-style: none;
+        }
+
+        #file-upload li {
+            margin-top: 10px;
+        }
+
+        #conversation-header {
+            font-size: 24px;
+            text-align: center;
+        }
+
+        #message-block {
+            border: 1px solid #ccc;
+            padding: 10px;
+            background-color: #f0f0f0;
+            margin-bottom: 10px;
+        }
+
+        .look-around {
+            padding: 10px;
+            margin: 5px;
+            background-color: #98a4ff;
+            transition: background-color 0.3s ease;
+        }
+
+        .look-around:hover {
+            background-color: #3f4486;
+        }
+
+        .look-around a {
+            color: #000;
+            text-decoration: none;
+        }
+
+        .look-around a:hover {
+            font-weight: bold;
+            color: white;
+        }
+    </style>
     <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
     <script th:src="@{/webjars/sockjs-client/sockjs.min.js}"></script>
     <script th:src="@{/webjars/stomp-websocket/stomp.min.js}"></script>
@@ -52,7 +111,7 @@
         }
 
         function showGreeting(message) {
-            $("#greetings").append("<tr><td>" + message + "</td></tr>");
+            $("#greetings").append("<tr><td id='message-block'>" + message + "</td></tr>");
         }
 
         $(function () {
@@ -95,7 +154,7 @@
             <table id="conversation" class="table table-striped">
                 <thead>
                 <tr>
-                    <th>대화</th>
+                    <th id="conversation-header" th:text="대화"></th>
                 </tr>
                 </thead>
                 <tbody id="greetings">
@@ -103,13 +162,14 @@
                 </tbody>
             </table>
         </div>
-        <ul id="file-upload">
-            <li>[협동분산시스템] 알고리즘 문제 업로드 사이트
-                <ul>
-                    <li><a href="/problems/new">파일 업로드하기</a></li>
-                </ul>
-            </li>
-        </ul>
+        <div class="col-md-12">
+            <ul id="file-upload">
+                <li>
+                    <ul class="look-around"><a href="/problems/new">파일, 스크린샷 업로드하기</a></ul>
+                    <ul class="look-around"><a href="/problem/problem-view">제출된 문제 보기</a></ul>
+                </li>
+            </ul>
+        </div>
     </div>
 </div>
 </body>

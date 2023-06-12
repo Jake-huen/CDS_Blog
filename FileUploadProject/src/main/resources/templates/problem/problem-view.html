@@ -11,19 +11,22 @@
 
         th {
             width: 10%;
-            text-align: left;
-            border-bottom: 5px solid #ddd;
-            padding-right: 20px;
+            font-size: 18px;
+            text-align: center;
+            border-bottom: 2px solid #ddd;
+            padding: 12px;
+            background-color: #f5f5f5;
+            font-weight: bold;
         }
 
         td {
-            padding: 8px;
+            padding: 10px;
             text-align: left;
             border-bottom: 1px solid #ddd;
         }
 
         tr:hover {
-            background-color: #f5f5f5;
+            background-color: #ece9e9;
         }
 
         .input-form input[type="text"] {
@@ -40,6 +43,24 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        a {
+            background-color: #afa0d5;
+            border: 1px solid black;
+            border-radius: 10px;
+            margin:10px;
+            padding:10px;
+            text-decoration: none;
+            color:white;
+        }
+        a:hover{
+            color: blue;
+            font-weight: bold;
         }
     </style>
     <link th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
@@ -62,58 +83,60 @@
     </script>
 </head>
 <body onload="connect()">
-<h1>제출한 문제들</h1>
-<div>
-    <a href="/problems/new">다른 문제 업로드하기</a>
-    <a href="/login">알림창</a>
+<div class="container">
+    <h1>제출한 문제들</h1>
+    <div id="other-site">
+        <a href="/problems/new">다른 문제 업로드하기</a>
+        <a href="/login">알림창</a>
+    </div>
+    <h4 class="mb-3" th:text="|회원이름: ${session.loginMember.getUserName()}|" th:id="name">로그인 사용자 이름</h4>
+    <div id="chat"></div>
+    <table>
+        <thead>
+        <tr id="chat-content"></tr>
+        <tr class="talbe-header">
+            <th>사용자 이름</th>
+            <th>문제 이름</th>
+            <th>작성 시간</th>
+            <th>logical Clock</th>
+            <th>수정하기</th>
+            <th>공유하기</th>
+            <th>파일 삭제</th>
+            <th>문제 URL</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="problem : ${problems}">
+            <td th:text="${problem.getUserName()}"></td>
+            <td th:text="${problem.problemName}"></td>
+            <td th:text="${problem.createdTime}"></td>
+            <td th:text="${problem.updatedTime}"></td>
+            <td>
+                <form th:action="@{/problem/edit}" method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="problemName" th:value="${problem.getProblemName()}">
+                    <button type="submit" style="padding: 10px 20px; font-size: 16px; margin: 10px; width: 100%">수정하기</button>
+                    <input type="file" name="attachFile" style="margin-top: 10px; padding: 10px 20px;">
+                </form>
+            </td>
+            <td>
+                <form th:action="@{/problem/share}" method="post">
+                    <input type="hidden" name="problemURL" th:value="${problem.problemURL}" />
+                    <input type="hidden" name="problemName" th:value="${problem.getProblemName()}" />
+                    <button type="submit" style="padding: 10px 20px; font-size: 16px; margin: 10px; width: 100%">공유하기</button>
+                </form>
+            </td>
+            <td>
+                <form th:action="@{/problem/delete}" method="post">
+                    <input type="hidden" name="problemName" th:value="${problem.getProblemName()}">
+                    <button type="submit" style="padding: 10px 20px; font-size: 16px; margin: 10px; width: 100%">삭제하기</button>
+                </form>
+            </td>
+            <td>
+                <a th:href="@{${problem.problemURL}}" th:text="다운로드" download></a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 </div>
-<h4 class="mb-3" th:text="|회원이름: ${session.loginMember.getUserName()}|" th:id="name">로그인 사용자 이름</h4>
-<div id="chat"></div>
-<table>
-    <thead>
-    <tr id="chat-content"></tr>
-    <tr>
-        <th>사용자 이름</th>
-        <th>문제 이름</th>
-        <th>작성 시간</th>
-        <th>logical Clock 시간</th>
-        <th>수정 후 다른 사람에게 알리기</th>
-        <th>다른 사람과 공유하기</th>
-        <th>파일 삭제</th>
-        <th>문제 URL</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="problem : ${problems}">
-        <td th:text="${problem.getUserName()}"></td>
-        <td th:text="${problem.problemName}"></td>
-        <td th:text="${problem.createdTime}"></td>
-        <td th:text="${problem.updatedTime}"></td>
-        <td>
-            <form th:action="@{/problem/edit}" method="post" enctype="multipart/form-data">
-                <input type="hidden" name="problemName" th:value="${problem.getProblemName()}">
-                <button type="submit">수정하기</button>
-                <input type="file" name="attachFile">
-            </form>
-        </td>
-        <td>
-            <form th:action="@{/problem/share}" method="post">
-                <input type="hidden" name="problemURL" th:value="${problem.problemURL}" />
-                <input type="hidden" name="problemName" th:value="${problem.getProblemName()}" />
-                <button type="submit">해당 문제 공유하기</button>
-            </form>
-        </td>
-        <td>
-            <form th:action="@{/problem/delete}" method="post">
-                <input type="hidden" name="problemName" th:value="${problem.getProblemName()}">
-                <button type="submit">삭제하기</button>
-            </form>
-        </td>
-        <td>
-            <a th:href="@{${problem.problemURL}}" th:text="다운로드" download></a>
-        </td>
-    </tr>
-    </tbody>
-</table>
 </body>
 </html>

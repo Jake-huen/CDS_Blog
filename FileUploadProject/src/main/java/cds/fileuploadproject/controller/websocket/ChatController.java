@@ -25,14 +25,14 @@ public class ChatController {
     @MessageMapping("/hello")
     @SendTo("/topic/hello")
     public String loginMessage(String message) {
-        return message + "님이 로그인하였습니다.";
+        return message + "님이 연결하였습니다.";
     }
 
     // 연결이 끊겼을때 메시지 보내기
     @MessageMapping("/bye")
     @SendTo("/topic/bye")
     public String logoutMessage(String message) {
-        return message + "님이 로그아웃하였습니다.";
+        return message + "님이 연결을 종료하였습니다.";
     }
 
     @MessageMapping("/edit")
