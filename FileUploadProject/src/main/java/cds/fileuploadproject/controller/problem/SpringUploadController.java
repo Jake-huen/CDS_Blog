@@ -37,8 +37,9 @@ public class SpringUploadController {
     }
 
     @GetMapping("/problem/problem-view")
-    public String showProblemView(Model model) {
-        List<ProblemDto> problems = problemService.getAllProblems();
+    public String showProblemView(Model model, HttpServletRequest request) {
+        MemberDto memberDto = (MemberDto) request.getSession().getAttribute(SessionConst.LOGIN_MEMBER);
+        List<ProblemDto> problems = problemService.getAllProblems(memberDto.getUserName());
         model.addAttribute("problems", problems);
         return "problem/problem-view";
     }

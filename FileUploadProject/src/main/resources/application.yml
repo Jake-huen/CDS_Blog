@@ -9,8 +9,10 @@ server:
     session:
       tracking-modes: cookie
       timeout: 1800
-  port:
+  port: # 로컬용 포트 번호
     8081
+#  port: # 배포용 포트 번호 (Nginx)
+#    5000
 spring:
   servlet:
     multipart:
@@ -30,9 +32,6 @@ spring:
     username: root
     password: rlaxogjs8312
   sql.init.mode: always
-#file:
-#  dir:
-#    /Users/kimtaeheon/Desktop/cds_project_upload/
 cloud:
   aws:
     s3:

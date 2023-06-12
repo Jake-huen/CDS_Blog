@@ -50,11 +50,11 @@ public class ProblemService {
 
     public void upload(ProblemForm form, String dirName) throws IOException {
         File uploadFile = convert(form.getAttachFile()).orElseThrow(() -> new IllegalArgumentException("파일 전환 실패"));
-        upload(uploadFile, form.getProblemName() + "번 문제 제출 파일들", dirName, 0);
+        upload(uploadFile, form.getProblemName() + "번 문제", dirName, 0);
 
         for (MultipartFile multipartFile : form.getImageFiles()) {
             File uploadImage = convert(multipartFile).orElseThrow(() -> new IllegalArgumentException("이미지 파일 전환 실패"));
-            upload(uploadImage, dirName + "님의 파일 목록입니다.", dirName, 0);
+            upload(uploadImage, dirName + "님의 제출한 문제이미지", dirName, 0);
         }
     }
 
@@ -104,18 +104,20 @@ public class ProblemService {
     }
 
     // 파일 보여주기
-    public List<ProblemDto> getAllProblems() {
+    public List<ProblemDto> getAllProblems(String userName) {
         List<Problem> problems = problemRepository.findAll();
         List<ProblemDto> problemDtos = new ArrayList<>();
         problems.stream().forEach(problem -> {
-            ProblemDto problemDto = ProblemDto.builder()
-                    .problemName(problem.getFileName())
-                    .problemURL(problem.getFileUrl())
-                    .userName(problem.getMember().getUserName())
-                    .createdTime(problem.getCreatedTime())
-                    .updatedTime(problem.getUpdatedTime())
-                    .build();
-            problemDtos.add(problemDto);
+            if(problem.getMember().getUserName().equals(userName) || problem.getFileName().contains("번 문제")) {
+                ProblemDto problemDto = ProblemDto.builder()
+                        .problemName(problem.getFileName())
+                        .problemURL(problem.getFileUrl())
+                        .userName(problem.getMember().getUserName())
+                        .createdTime(problem.getCreatedTime())
+                        .updatedTime(problem.getUpdatedTime())
+                        .build();
+                problemDtos.add(problemDto);
+            }
         });
         return problemDtos;
     }
@@ -131,12 +133,28 @@ public class ProblemService {
         log.info("잘 업데이트되었습니다");
 
         // 소켓 통신
+        sendToSocketUpdate(dirName, oldProblemName, editedFile);
+    }
+
+    // 파일 삭제
+    public void deleteProblem(String problemName) {
+        Problem problem = problemRepository.findByFileName(problemName);
+        String userName = problem.getMember().getUserName();
+        problemRepository.delete(problem);
+        log.info("잘 삭제되었습니다.");
+        // 소켓 통신
+        sendToSocketDelete(problemName, userName);
+
+    }
+
+    private void sendToSocketUpdate(String dirName, String oldProblemName, File editedFile) {
         List<Transport> transports = new ArrayList<>();
         transports.add(new WebSocketTransport(new StandardWebSocketClient()));
         SockJsClient sockJsClient = new SockJsClient(transports);
         WebSocketStompClient stompClient = new WebSocketStompClient(sockJsClient);
         stompClient.setMessageConverter(new MappingJackson2MessageConverter());
-        String url = "ws://localhost:8081/chat"; // WebSocket 서버 URL
+        String url = "ws://localhost:8081/chat"; // 로컬 WebScoket URL
+        // String url = "ws://cdsfileupload.ap-northeast-2.elasticbeanstalk.com/chat"; // WebSocket 서버 URL
         stompClient.connect(url, new StompSessionHandlerAdapter() {
             @Override
             public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
@@ -146,20 +164,14 @@ public class ProblemService {
         });
     }
 
-    // 파일 삭제
-    public void deleteProblem(String problemName) {
-        Problem problem = problemRepository.findByFileName(problemName);
-        String userName = problem.getMember().getUserName();
-        problemRepository.delete(problem);
-        log.info("잘 삭제되었습니다.");
-
-        // 소켓 통신
+    private void sendToSocketDelete(String problemName, String userName) {
         List<Transport> transports = new ArrayList<>();
         transports.add(new WebSocketTransport(new StandardWebSocketClient()));
         SockJsClient sockJsClient = new SockJsClient(transports);
         WebSocketStompClient stompClient = new WebSocketStompClient(sockJsClient);
         stompClient.setMessageConverter(new MappingJackson2MessageConverter());
-        String url = "ws://localhost:8081/chat"; // WebSocket 서버 URL
+        String url = "ws://localhost:8081/chat"; // 로컬 WebScoket URL
+        // String url = "ws://cdsfileupload.ap-northeast-2.elasticbeanstalk.com/chat"; // WebSocket 서버 URL
         stompClient.connect(url, new StompSessionHandlerAdapter() {
             @Override
             public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
@@ -167,7 +179,6 @@ public class ProblemService {
                 sendDeleteMessage(problemName, userName);
             }
         });
-
     }
 
     public void sendChatMessage(String filename, String oldFileName, String userName) {
