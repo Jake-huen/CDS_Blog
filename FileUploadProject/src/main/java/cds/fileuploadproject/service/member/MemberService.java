@@ -1,45 +1,48 @@
-package cds.fileuploadproject.repository;
+package cds.fileuploadproject.service.member;
 
+import cds.fileuploadproject.domain.Member;
 import cds.fileuploadproject.dto.MemberDto;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Repository;
+import cds.fileuploadproject.repository.MemberRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Optional;
 
-@Slf4j
-@Repository
+@Service
+@RequiredArgsConstructor
 public class MemberService {
-    private static Map<Long, MemberDto> store = new HashMap<>();
-    private static long sequence = 0L;
 
-    public MemberDto save(MemberDto memberDto) {
-        memberDto.setId(++sequence);
-        log.info("save: member={}", memberDto);
-        System.out.println("member = " + memberDto);
-        store.put(memberDto.getId(), memberDto);
-        return memberDto;
-    }
+    private final MemberRepository memberRepository;
 
-    public MemberDto findById(Long id) {
-        return store.get(id);
-    }
-
-    public Optional<MemberDto> findByLoginId(String loginId) {
-        List<MemberDto> all = findAll();
-        for (MemberDto m : all) {
-            if(m.getLoginId().equals(loginId)){
-                return Optional.of(m);
-            }
+    public MemberDto login(String userName, String password) {
+        Optional<Member> member = memberRepository.findByUserName(userName);
+        MemberDto memberDto = MemberDto.builder()
+                .id(member.get().getId())
+                .userName(member.get().getUserName())
+                .password(member.get().getPassword())
+                .build();
+        if (memberDto.getPassword().equals(password)) {
+            return memberDto;
+        } else {
+            return null;
         }
-        return Optional.empty();
     }
 
-    public List<MemberDto> findAll(){
-        ArrayList<MemberDto> memberDtoArrayList = new ArrayList<>(store.values());
-        return memberDtoArrayList;
-    }
-
-    public void clearStore(){
-        store.clear();
+    public MemberDto signUp(String userName, String password) {
+        Optional<Member> check = memberRepository.findByUserName(userName);
+        if (check.isPresent()) {
+            throw new RuntimeException("이미 존재하는 사용자이름입니다");
+        }
+        Member member = Member.builder()
+                .userName(userName)
+                .password(password)
+                .build();
+        memberRepository.save(member);
+        MemberDto memberDto = MemberDto.builder()
+                .id(member.getId())
+                .userName(member.getUserName())
+                .password(member.getPassword())
+                .build();
+        return memberDto;
     }
 }

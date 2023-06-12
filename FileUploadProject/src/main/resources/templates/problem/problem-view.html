@@ -1,22 +1,110 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
+    <title>업로드한 파일들</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            width: 20%;
+            text-align: left;
+            border-bottom: 5px solid #ddd;
+            padding-right: 20px;
+        }
+
+        td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .input-form input[type="text"] {
+            width: 300px;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .input-form input[type="submit"] {
+            padding: 5px 10px;
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+    <link th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
+    <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+    <script th:src="@{/webjars/sockjs-client/sockjs.min.js}"></script>
+    <script th:src="@{/webjars/stomp-websocket/stomp.min.js}"></script>
+    <script>
+        let stompClient = null;
+
+        function connect() {
+            let socket = new SockJS('/chat');
+            stompClient = Stomp.over(socket);
+        }
+
+        function disconnect() {
+            if (stompClient !== null) {
+                stompClient.disconnect();
+            }
+            console.log("Disconnected");
+        }
+    </script>
 </head>
-<body>
-
-<div class="container">
-
-    <div class="py-5 text-center">
-        <h2>문제 조회</h2>
-    </div>
-
-    문제이름: <span th:text="${problemDto.problemName}">문제이름</span><br/>
-    첨부파일: <a th:if="${problemDto.attachFile}" th:href="|/attach/${problemDto.id}|"
-             th:text="${problemDto.getAttachFile().getUploadFileName()}"/><br/>
-    <img th:each="imageFile : ${problemDto.imageFiles}" th:src="|/images/${imageFile.getStoreFileName()}|" width="300"
-         height="300"/>
-
-</div> <!-- /container -->
+<body onload="connect()">
+<h1>제출한 문제들</h1>
+<div>
+    <a href="/problems/new">다른 문제 업로드하기</a>
+</div>
+<h4 class="mb-3" th:text="|회원이름: ${session.loginMember.getUserName()}|" th:id="name">로그인 사용자 이름</h4>
+<div id="chat"></div>
+<table>
+    <thead>
+    <tr id="chat-content"></tr>
+    <tr>
+        <th>사용자 이름</th>
+        <th>문제 이름</th>
+        <th>작성 시간</th>
+        <th>수정 시간(수정할 때마다 증가)</th>
+        <th>수정</th>
+        <th>문제 URL</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="problem : ${problems}">
+        <td th:text="${problem.getUserName()}"></td>
+        <td th:text="${problem.problemName}"></td>
+        <td th:text="${problem.createdTime}"></td>
+        <td th:text="${problem.updatedTime}"></td>
+        <td>
+            <form th:action="@{/problem/edit}" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="problemName" th:value="${problem.getProblemName()}">
+                <button type="submit">수정하기</button>
+                <input type="file" name="attachFile">
+            </form>
+        </td>
+        <td>
+            <form th:action="@{/problem/delete}" method="post">
+                <input type="hidden" name="problemName" th:value="${problem.getProblemName()}">
+                <button type="submit">삭제하기</button>
+            </form>
+        </td>
+        <td>
+            <a th:href="@{${problem.problemURL}}" th:text="다운로드" download></a>
+        </td>
+    </tr>
+    </tbody>
+</table>
 </body>
 </html>

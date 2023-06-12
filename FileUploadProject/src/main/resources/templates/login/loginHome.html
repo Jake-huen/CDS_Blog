@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <title>로그인</title>
-    <link href="/webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/main.css" rel="stylesheet">
-    <script src="/webjars/jquery/jquery.min.js"></script>
-    <script src="/webjars/sockjs-client/sockjs.min.js"></script>
-    <script src="/webjars/stomp-websocket/stomp.min.js"></script>
+    <link th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/main.css}" rel="stylesheet">
+    <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+    <script th:src="@{/webjars/sockjs-client/sockjs.min.js}"></script>
+    <script th:src="@{/webjars/stomp-websocket/stomp.min.js}"></script>
     <script>
         let stompClient = null;
+
         function setConnected(connected) {
             $("#connect").prop("disabled", connected);
             $("#disconnect").prop("disabled", !connected);
@@ -21,7 +22,9 @@
                 $("#file-upload").hide();
             }
         }
+
         function connect() {
+            // SockJS 라이브러리를 사용하여 웹 소켓 연결을 설정하는 JavaScript 코드입니다.
             let socket = new SockJS('/login');
             stompClient = Stomp.over(socket);
             stompClient.connect({}, function (frame) {
@@ -31,6 +34,9 @@
                     showGreeting(message.body);
                 });
                 stompClient.subscribe('/topic/bye', function (message) {
+                    showGreeting(message.body);
+                })
+                stompClient.subscribe('/topic/messages', function (message) {
                     showGreeting(message.body);
                 })
                 setConnected(true);
@@ -48,7 +54,6 @@
         function showGreeting(message) {
             $("#greetings").append("<tr><td>" + message + "</td></tr>");
         }
-
 
         $(function () {
             $("#file-upload").hide();
@@ -68,22 +73,18 @@
     </script>
 </head>
 <body>
-<noscript><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being
-    enabled. Please enable
-    Javascript and reload this page!</h2></noscript>
 <div id="main-content" class="container">
     <div class="row">
         <div class="col-md-6">
             <form class="form-inline">
                 <div class="form-group">
-                    <h4 class="mb-3" th:text="|회원이름: ${memberDto.name}|" th:id="name">로그인 사용자 이름</h4>
+                    <h4 class="mb-3" th:text="|회원이름: ${session.loginMember.getUserName()}|" th:id="name">로그인 사용자 이름</h4>
                     <button id="connect" class="w-100 btn btn-dark btn-lg" type="submit">
                         연결
                     </button>
                     <button id="disconnect" class="w-100 btn btn-dark btn-lg" type="submit"
                             disabled="disabled">
                         로그아웃
-                    </button>
                     </button>
                 </div>
             </form>
@@ -98,14 +99,14 @@
                 </tr>
                 </thead>
                 <tbody id="greetings">
+                <div id="file-message"></div>
                 </tbody>
             </table>
         </div>
         <ul id="file-upload">
             <li>[협동분산시스템] 알고리즘 문제 업로드 사이트
                 <ul>
-                    <li ><a href="/spring/upload">파일 업로드하기</a></li>
-<!--                    <li><a href="/problems/new">알고리즘 - 코드, 제출 이미지 업로드하기</a></li>-->
+                    <li><a href="/problems/new">파일 업로드하기</a></li>
                 </ul>
             </li>
         </ul>

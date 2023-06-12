@@ -1,7 +1,7 @@
 package cds.fileuploadproject.controller.member;
 
 import cds.fileuploadproject.dto.MemberDto;
-import cds.fileuploadproject.repository.MemberService;
+import cds.fileuploadproject.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -30,7 +30,7 @@ public class MemberController {
         if (bindingResult.hasErrors()) {
             return "members/addMemberForm"; // 에러가 있으면 다시 홈화면으로 보내버린다.
         }
-        memberService.save(memberDto);
+        memberService.signUp(memberDto.getUserName(), memberDto.getPassword());
         return "redirect:/";
     }
 }
