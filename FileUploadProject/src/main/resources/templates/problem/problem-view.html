@@ -52,9 +52,6 @@
         function connect() {
             let socket = new SockJS('/chat');
             stompClient = Stomp.over(socket);
-            stompClient.connect({}, function () {
-                stompClient.send('/app/sendMessage', $('#name').text().toString() + "님이 문제들을 보고 있습니다.");
-            });
         }
 
         function disconnect() {
@@ -63,12 +60,6 @@
             }
             console.log("Disconnected");
         }
-
-        $(function () {
-            $("#temp").click(function () {
-
-            });
-        })
     </script>
 </head>
 <body onload="connect()">
