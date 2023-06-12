@@ -12,8 +12,17 @@ import com.amazonaws.services.s3.model.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.messaging.converter.MappingJackson2MessageConverter;
+import org.springframework.messaging.simp.stomp.StompHeaders;
+import org.springframework.messaging.simp.stomp.StompSession;
+import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.socket.client.standard.StandardWebSocketClient;
+import org.springframework.web.socket.messaging.WebSocketStompClient;
+import org.springframework.web.socket.sockjs.client.SockJsClient;
+import org.springframework.web.socket.sockjs.client.Transport;
+import org.springframework.web.socket.sockjs.client.WebSocketTransport;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
@@ -33,21 +42,24 @@ public class ProblemService {
     private final ProblemRepository problemRepository;
     private final MemberRepository memberRepository;
 
+    // 소켓 통신을 위함
+    private StompSession stompSession;
+    List<Transport> transports = new ArrayList<>();
     @Value("${cloud.aws.s3.bucket}")
     public String bucket;
 
     public void upload(ProblemForm form, String dirName) throws IOException {
         File uploadFile = convert(form.getAttachFile()).orElseThrow(() -> new IllegalArgumentException("파일 전환 실패"));
-        upload(uploadFile, form.getProblemName() + "번 문제 제출 파일들", dirName);
+        upload(uploadFile, form.getProblemName() + "번 문제 제출 파일들", dirName, 0);
 
         for (MultipartFile multipartFile : form.getImageFiles()) {
             File uploadImage = convert(multipartFile).orElseThrow(() -> new IllegalArgumentException("이미지 파일 전환 실패"));
-            upload(uploadImage, dirName + "님의 파일 목록입니다.", dirName);
+            upload(uploadImage, dirName + "님의 파일 목록입니다.", dirName, 0);
         }
     }
 
     // S3로 파일 업로드하기
-    private String upload(File uploadFile, String dirName, String userName) {
+    private String upload(File uploadFile, String dirName, String userName, int editCount) {
         String fileName = dirName + "/" + uploadFile.getName(); // S3에 저장된 파일 이름
         String uploadImageUrl = putS3(uploadFile, fileName); // s3로 업로드
         URL url = amazonS3Client.getUrl(bucket, fileName);
@@ -56,7 +68,7 @@ public class ProblemService {
                 .fileName(fileName)
                 .fileUrl(url)
                 .createdTime(0)
-                .updatedTime(0)
+                .updatedTime(editCount)
                 .member(member.get())
                 .build();
         problemRepository.save(problem);
@@ -111,16 +123,62 @@ public class ProblemService {
     // 파일 수정
     public void updateProblem(String problemName, MultipartFile multipartFile, String dirName) throws IOException {
         Problem oldProblem = problemRepository.findByFileName(problemName);
+        int editCount = oldProblem.getUpdatedTime() + 1; // 한번 업데이트 할 때마다 업데이트 횟수 기록
+        String oldProblemName = oldProblem.getFileName();
         File editedFile = convert(multipartFile).orElseThrow(() -> new IllegalArgumentException("이미지 파일 전환 실패"));
-        upload(editedFile, dirName + "님의 파일 목록입니다.", dirName);
+        upload(editedFile, dirName + "님의 파일 목록입니다.", dirName, editCount);
         problemRepository.delete(oldProblem);
         log.info("잘 업데이트되었습니다");
+
+        // 소켓 통신
+        List<Transport> transports = new ArrayList<>();
+        transports.add(new WebSocketTransport(new StandardWebSocketClient()));
+        SockJsClient sockJsClient = new SockJsClient(transports);
+        WebSocketStompClient stompClient = new WebSocketStompClient(sockJsClient);
+        stompClient.setMessageConverter(new MappingJackson2MessageConverter());
+        String url = "ws://localhost:8081/chat"; // WebSocket 서버 URL
+        stompClient.connect(url, new StompSessionHandlerAdapter() {
+            @Override
+            public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
+                stompSession = session;
+                sendChatMessage(editedFile.getName(), oldProblemName, dirName);
+            }
+        });
     }
 
     // 파일 삭제
-    public void deleteProblem(String problemName){
+    public void deleteProblem(String problemName) {
         Problem problem = problemRepository.findByFileName(problemName);
+        String userName = problem.getMember().getUserName();
         problemRepository.delete(problem);
         log.info("잘 삭제되었습니다.");
+
+        // 소켓 통신
+        List<Transport> transports = new ArrayList<>();
+        transports.add(new WebSocketTransport(new StandardWebSocketClient()));
+        SockJsClient sockJsClient = new SockJsClient(transports);
+        WebSocketStompClient stompClient = new WebSocketStompClient(sockJsClient);
+        stompClient.setMessageConverter(new MappingJackson2MessageConverter());
+        String url = "ws://localhost:8081/chat"; // WebSocket 서버 URL
+        stompClient.connect(url, new StompSessionHandlerAdapter() {
+            @Override
+            public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
+                stompSession = session;
+                sendDeleteMessage(problemName, userName);
+            }
+        });
+
+    }
+
+    public void sendChatMessage(String filename, String oldFileName, String userName) {
+        if (stompSession != null && stompSession.isConnected()) {
+            stompSession.send("/app/sendMessage", userName+"님이 " + oldFileName+"문제를 " + filename + "문제로 업데이트하였습니다.");
+        }
+    }
+
+    public void sendDeleteMessage(String filename, String userName) {
+        if (stompSession != null && stompSession.isConnected()) {
+            stompSession.send("/app/sendMessage", userName+"님이 " + filename + "문제를 삭제하였습니다.");
+        }
     }
 }

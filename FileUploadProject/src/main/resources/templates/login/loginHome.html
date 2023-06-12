@@ -10,6 +10,7 @@
     <script th:src="@{/webjars/stomp-websocket/stomp.min.js}"></script>
     <script>
         let stompClient = null;
+
         function setConnected(connected) {
             $("#connect").prop("disabled", connected);
             $("#disconnect").prop("disabled", !connected);
@@ -21,7 +22,9 @@
                 $("#file-upload").hide();
             }
         }
+
         function connect() {
+            // SockJS 라이브러리를 사용하여 웹 소켓 연결을 설정하는 JavaScript 코드입니다.
             let socket = new SockJS('/login');
             stompClient = Stomp.over(socket);
             stompClient.connect({}, function (frame) {
@@ -31,6 +34,9 @@
                     showGreeting(message.body);
                 });
                 stompClient.subscribe('/topic/bye', function (message) {
+                    showGreeting(message.body);
+                })
+                stompClient.subscribe('/topic/messages', function (message) {
                     showGreeting(message.body);
                 })
                 setConnected(true);
@@ -48,7 +54,6 @@
         function showGreeting(message) {
             $("#greetings").append("<tr><td>" + message + "</td></tr>");
         }
-
 
         $(function () {
             $("#file-upload").hide();
@@ -68,8 +73,6 @@
     </script>
 </head>
 <body>
-<noscript><h2 th:text="'Seems your browser doesn\'t support Javascript! Websocket relies on Javascript being ' +
-    'enabled. Please enable Javascript and reload this page!'" style="color: #ff0000"></h2></noscript>
 <div id="main-content" class="container">
     <div class="row">
         <div class="col-md-6">
@@ -96,6 +99,7 @@
                 </tr>
                 </thead>
                 <tbody id="greetings">
+                <div id="file-message"></div>
                 </tbody>
             </table>
         </div>

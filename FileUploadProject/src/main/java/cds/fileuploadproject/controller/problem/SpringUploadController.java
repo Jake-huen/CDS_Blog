@@ -43,6 +43,11 @@ public class SpringUploadController {
         return "problem/problem-view";
     }
 
+    @PostMapping("/problem/problem-view")
+    public String problemView() {
+        return "problem/problem-view";
+    }
+
     // 수정하기
     @PostMapping("/problem/edit")
     public String handleEditProblem(@RequestParam("problemName") String problemName,
