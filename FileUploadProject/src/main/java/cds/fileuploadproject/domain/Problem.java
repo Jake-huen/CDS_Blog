@@ -5,14 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.data.annotation.CreatedDate;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
-import java.time.LocalDateTime;
+import javax.persistence.*;
+import java.net.URL;
 
 @Entity
 @Data
@@ -21,17 +16,18 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class Problem {
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private String file_url;
+    private String fileName;
+
+    @Column(length = 2000)
+    private URL fileUrl;
 
     @OneToOne
     private Member member;
 
-    @CreatedDate
-    private LocalDateTime createdDate;
+    private int createdTime;
 
-    @UpdateTimestamp
-    private LocalDateTime updatedDate;
+    private int updatedTime;
 }
