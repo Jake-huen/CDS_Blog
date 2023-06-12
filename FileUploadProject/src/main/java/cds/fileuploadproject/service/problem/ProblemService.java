@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -54,7 +55,7 @@ public class ProblemService {
 
         for (MultipartFile multipartFile : form.getImageFiles()) {
             File uploadImage = convert(multipartFile).orElseThrow(() -> new IllegalArgumentException("이미지 파일 전환 실패"));
-            upload(uploadImage, dirName + "님의 제출한 문제이미지", dirName, 0);
+            upload(uploadImage, dirName + "님이 제출한" + form.getProblemName() + "문제", dirName, 0);
         }
     }
 
@@ -67,7 +68,7 @@ public class ProblemService {
         Problem problem = Problem.builder()
                 .fileName(fileName)
                 .fileUrl(url)
-                .createdTime(0)
+                .createdTime(LocalDateTime.now())
                 .updatedTime(editCount)
                 .member(member.get())
                 .build();
@@ -108,7 +109,7 @@ public class ProblemService {
         List<Problem> problems = problemRepository.findAll();
         List<ProblemDto> problemDtos = new ArrayList<>();
         problems.stream().forEach(problem -> {
-            if(problem.getMember().getUserName().equals(userName) || problem.getFileName().contains("번 문제")) {
+            if(problem.getMember().getUserName().equals(userName) || problem.getFileName().contains("님이 제출한 문제")) {
                 ProblemDto problemDto = ProblemDto.builder()
                         .problemName(problem.getFileName())
                         .problemURL(problem.getFileUrl())

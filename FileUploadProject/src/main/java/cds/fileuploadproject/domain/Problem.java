@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.net.URL;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -27,7 +28,7 @@ public class Problem {
     @OneToOne
     private Member member;
 
-    private int createdTime;
+    private LocalDateTime createdTime;
 
     private int updatedTime;
 }

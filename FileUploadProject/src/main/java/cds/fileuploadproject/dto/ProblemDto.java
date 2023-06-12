@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -13,6 +14,6 @@ public class ProblemDto {
     private String problemName;
     private URL problemURL;
     private String userName;
-    private int createdTime;
+    private LocalDateTime createdTime;
     private int updatedTime;
 }

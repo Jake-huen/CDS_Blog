@@ -27,6 +27,11 @@ public class LoginController {
         return "login/loginForm";
     }
 
+    @GetMapping("/login/home")
+    public String loginHome(@ModelAttribute("loginForm") LoginForm loginForm){
+        return "login/loginHome";
+    }
+
     @PostMapping("/login")
     public String login(@Validated @ModelAttribute LoginForm loginForm, BindingResult bindingResult, HttpServletRequest request) {
         if (bindingResult.hasErrors()) {
