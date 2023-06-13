@@ -9,10 +9,10 @@ server:
     session:
       tracking-modes: cookie
       timeout: 1800
-  port: # 로컬용 포트 번호
-    8081
-#  port: # 배포용 포트 번호 (Nginx)
-#    5000
+#  port: # 로컬용 포트 번호
+#    8081
+  port: # 배포용 포트 번호 (Nginx)
+    5000
 spring:
   servlet:
     multipart:

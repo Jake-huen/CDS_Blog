@@ -154,13 +154,30 @@ public class ProblemService {
         SockJsClient sockJsClient = new SockJsClient(transports);
         WebSocketStompClient stompClient = new WebSocketStompClient(sockJsClient);
         stompClient.setMessageConverter(new MappingJackson2MessageConverter());
-        String url = "ws://localhost:8081/chat"; // 로컬 WebScoket URL
-        // String url = "ws://cdsfileupload.ap-northeast-2.elasticbeanstalk.com/chat"; // WebSocket 서버 URL
+        // String url = "ws://localhost:8081/chat"; // 로컬 WebScoket URL
+        String url = "ws://cdsfileupload.ap-northeast-2.elasticbeanstalk.com/chat"; // WebSocket 서버 URL
         stompClient.connect(url, new StompSessionHandlerAdapter() {
             @Override
             public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
                 stompSession = session;
                 sendChatMessage(editedFile.getName(), oldProblemName, dirName);
+            }
+        });
+    }
+
+    public void shareProblem(String problemName, String problemURL, String userName) {
+        List<Transport> transports = new ArrayList<>();
+        transports.add(new WebSocketTransport(new StandardWebSocketClient()));
+        SockJsClient sockJsClient = new SockJsClient(transports);
+        WebSocketStompClient stompClient = new WebSocketStompClient(sockJsClient);
+        stompClient.setMessageConverter(new MappingJackson2MessageConverter());
+        // String url = "ws://localhost:8081/chat"; // 로컬 WebScoket URL
+        String url = "ws://cdsfileupload.ap-northeast-2.elasticbeanstalk.com/chat"; // WebSocket 서버 URL
+        stompClient.connect(url, new StompSessionHandlerAdapter() {
+            @Override
+            public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
+                stompSession = session;
+                sendShareMessage(problemName, problemURL, userName);
             }
         });
     }
@@ -171,8 +188,8 @@ public class ProblemService {
         SockJsClient sockJsClient = new SockJsClient(transports);
         WebSocketStompClient stompClient = new WebSocketStompClient(sockJsClient);
         stompClient.setMessageConverter(new MappingJackson2MessageConverter());
-        String url = "ws://localhost:8081/chat"; // 로컬 WebScoket URL
-        // String url = "ws://cdsfileupload.ap-northeast-2.elasticbeanstalk.com/chat"; // WebSocket 서버 URL
+        // String url = "ws://localhost:8081/chat"; // 로컬 WebScoket URL
+        String url = "ws://cdsfileupload.ap-northeast-2.elasticbeanstalk.com/chat"; // WebSocket 서버 URL
         stompClient.connect(url, new StompSessionHandlerAdapter() {
             @Override
             public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
@@ -200,20 +217,4 @@ public class ProblemService {
         }
     }
 
-    public void shareProblem(String problemName, String problemURL, String userName) {
-        List<Transport> transports = new ArrayList<>();
-        transports.add(new WebSocketTransport(new StandardWebSocketClient()));
-        SockJsClient sockJsClient = new SockJsClient(transports);
-        WebSocketStompClient stompClient = new WebSocketStompClient(sockJsClient);
-        stompClient.setMessageConverter(new MappingJackson2MessageConverter());
-        String url = "ws://localhost:8081/chat"; // 로컬 WebScoket URL
-        // String url = "ws://cdsfileupload.ap-northeast-2.elasticbeanstalk.com/chat"; // WebSocket 서버 URL
-        stompClient.connect(url, new StompSessionHandlerAdapter() {
-            @Override
-            public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
-                stompSession = session;
-                sendShareMessage(problemName, problemURL, userName);
-            }
-        });
-    }
 }
