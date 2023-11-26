@@ -46,6 +46,7 @@ public class ProblemService {
     // 소켓 통신을 위함
     private StompSession stompSession;
     List<Transport> transports = new ArrayList<>();
+
     @Value("${cloud.aws.s3.bucket}")
     public String bucket;
 
